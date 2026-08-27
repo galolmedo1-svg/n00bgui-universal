@@ -1,0 +1,1000 @@
+-- n00bgui universal v5.7 --
+-- BY NOOBSCRIPTER0123 --
+
+local Lighting = game:GetService("Lighting")
+local PathfindingService = game:GetService("PathfindingService")
+local Players = game:GetService("Players") 
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local DECAL_IMAGE_ID = "rbxassetid://753015086" 
+local MUSIC_ID = "rbxassetid://121528450711301"
+
+-- efectos de ambiente --
+task.spawn(function() 
+    while true do 
+        task.wait(2) 
+        Lighting.Ambient = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255)) 
+    end
+end)
+
+-- mensajes de consola --
+local msgs = {
+    "(: Noobscripter0123 esta aqui :)",
+    "(: ¡¡¡Unete al equipo noobscripter0123 hoyyy!!! :)",
+    "(: n00bgui v5.7 cargada exitosamente, hora de sufrir :)"
+}
+
+task.spawn(function()
+    print(msgs[1])
+    print(msgs[2])
+    print(msgs[3])
+    while true do 
+        task.wait(3) 
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = msgs[math.random(1,#msgs)], 
+            Color = Color3.fromRGB(255, 255, 0), 
+            Font = Enum.Font.SourceSansBold
+        }) 
+    end
+end)
+
+-- GUI PRINCIPAL --
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 260, 0, 480)
+Main.Position = UDim2.new(0.1, 0, 0.2, 0)
+Main.BackgroundColor3 = Color3.new(0, 0, 0)
+Main.BorderColor3 = Color3.fromRGB(255, 255, 0)
+Main.BorderSizePixel = 4
+Main.Active = true
+Main.Draggable = true
+
+-- Foto del líder --
+local Logo = Instance.new("ImageLabel", Main)
+Logo.Size = UDim2.new(1, 0, 0, 120)
+Logo.Image = DECAL_IMAGE_ID
+Logo.BackgroundTransparency = 1
+
+-- VANER KON CRÉDYTOZ --
+local Banner = Instance.new("TextLabel", Main)
+Banner.Size = UDim2.new(1, 0, 0, 40)
+Banner.Position = UDim2.new(0, 0, 0, 120)
+Banner.BackgroundColor3 = Color3.fromRGB(200, 200, 0)
+Banner.Text = "n00bgui v5.7 by noobscripter0123"
+Banner.TextColor3 = Color3.new(0, 0, 0)
+Banner.TextScaled = true
+Banner.Font = Enum.Font.Code
+
+local Scroll = Instance.new("ScrollingFrame", Main)
+Scroll.Size = UDim2.new(1, 0, 1, -170)
+Scroll.Position = UDim2.new(0, 0, 0, 170)
+Scroll.BackgroundTransparency = 1
+Scroll.CanvasSize = UDim2.new(0, 0, 2, 0)
+
+local layout = Instance.new("UIListLayout", Scroll)
+layout.Padding = UDim.new(0, 5)
+layout.HorizontalAlignment = "Center"
+
+-- creador de botones --
+local function createBtn(text, func)
+    local b = Instance.new("TextButton", Scroll)
+    b.Size = UDim2.new(0.9, 0, 0, 35)
+    b.Text = text
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    b.TextColor3 = Color3.fromRGB(255, 255, 0)
+    b.Font = Enum.Font.SourceSansBold
+    b.BorderSizePixel = 1
+    b.BorderColor3 = Color3.fromRGB(255, 255, 0)
+    b.MouseButton1Click:Connect(func)
+end
+
+local MinBtn = Instance.new("TextButton", Banner)
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -35, 0.5, -15)
+MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MinBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MinBtn.BorderSizePixel = 2
+MinBtn.Text = "-"
+MinBtn.TextColor3 = Color3.fromRGB(255, 255, 0)
+MinBtn.TextSize = 20
+MinBtn.Font = Enum.Font.SourceSansBold
+
+local minimizado = false
+
+MinBtn.MouseButton1Click:Connect(function()
+    if not minimizado then
+        Scroll.Visible = false
+        Main.Size = UDim2.new(0, 260, 0, 160)
+        MinBtn.Text = "+"
+        minimizado = true
+    else
+        Main.Size = UDim2.new(0, 260, 0, 480)
+        Scroll.Visible = true
+        MinBtn.Text = "-"
+        minimizado = false
+    end
+end)
+
+-- Creador de textos ESP --
+local function createfloatingtext(objetivo, idOffset, texto, color)
+    local guiName = "n00bESP_Line_" .. tostring(idOffset)
+    local bbgui = objetivo:FindFirstChild(guiName)
+    
+    if not bbgui then
+        bbgui = Instance.new("BillboardGui")
+        bbgui.Name = guiName
+        bbgui.AlwaysOnTop = true
+        bbgui.Size = UDim2.new(0, 200, 0, 30)
+        bbgui.MaxDistance = 500
+        bbgui.Adornee = objetivo
+        bbgui.Parent = objetivo
+    end
+    bbgui.StudsOffset = Vector3.new(0, idOffset, 0)
+    
+    local label = bbgui:FindFirstChild("TextLabel")
+    if not label then
+        label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.SourceSansBold
+        label.TextSize = 14 
+        label.TextStrokeTransparency = 0
+        label.TextStrokeColor3 = Color3.new(0, 0, 0)
+        label.Parent = bbgui
+    end
+    label.TextColor3 = color
+    label.Text = texto
+end
+
+local function aplicarHighlight(char, color)
+    local hl = char:FindFirstChild("n00bHighlight")
+    if not hl then
+        hl = Instance.new("Highlight")
+        hl.Name = "n00bHighlight"
+        hl.Parent = char
+    end
+    hl.FillColor = color
+    hl.OutlineColor = Color3.new(1, 1, 1)
+    hl.FillTransparency = 0.5
+    hl.MaxDistance = 500
+end
+
+-- Botones --
+
+createBtn("MENSAJE (5 SEGUNDOS)", function()
+    local msgGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+    msgGui.IgnoreGuiInset = true
+    local msgFrame = Instance.new("Frame", msgGui)
+    msgFrame.Size = UDim2.new(1, 0, 1, 0)
+    msgFrame.BackgroundColor3 = Color3.new(0,0,0)
+    local msgText = Instance.new("TextLabel", msgFrame)
+    msgText.Size = UDim2.new(0.8, 0, 0.2, 0)
+    msgText.Position = UDim2.new(0.1, 0, 0.4, 0)
+    msgText.BackgroundTransparency = 1
+    msgText.Text = "JOIN THE NOOBSCRIPTER0123 TEAM TODAYYY!!!"
+    msgText.TextColor3 = Color3.new(1,1,0)
+    msgText.Font = Enum.Font.Code
+    msgText.TextScaled = true
+    task.delay(5, function() msgGui:Destroy() end)
+end)
+
+createBtn("PARTICULAS", function()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Humanoid") then
+            local p = Instance.new("ParticleEmitter", v.Parent:FindFirstChild("HumanoidRootPart") or v.Parent:FindFirstChild("Torso"))
+            p.Texture = DECAL_IMAGE_ID 
+            p.Size = NumberSequence.new(1.5)
+            p.Rate = 25
+        end
+    end
+end)
+
+local fireEnabled = false
+createBtn("FIRE TOUCH", function() fireEnabled = true end)
+
+createBtn("Invocar clon peruano", function()
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.Archivable = true
+        local clone = char:Clone()
+        clone.Name = "BLACK_GUY"
+        clone.Parent = workspace
+        
+        for _, p in pairs(clone:GetDescendants()) do
+            if p:IsA("BasePart") then 
+                p.Color = Color3.new(0,0,0) 
+                p.Material = Enum.Material.Neon
+            elseif p:IsA("Accessory") or p:IsA("Shirt") or p:IsA("Pants") then 
+                p:Destroy() 
+            end
+        end
+        
+        local cHumanoid = clone:FindFirstChildOfClass("Humanoid")
+        local cRoot = clone:FindFirstChild("HumanoidRootPart")
+        
+        task.spawn(function()
+            while clone.Parent and cRoot and cHumanoid do
+                local target = nil
+                local dist = 1000
+                
+                for _, pl in pairs(Players:GetPlayers()) do
+                    if pl ~= player and pl.Character and pl.Character:FindFirstChild("HumanoidRootPart") then
+                        local d = (pl.Character.HumanoidRootPart.Position - cRoot.Position).Magnitude
+                        if d < dist then 
+                            dist = d 
+                            target = pl.Character 
+                        end
+                    end
+                end
+                
+                if target and target:FindFirstChild("HumanoidRootPart") then
+                    local tRoot = target.HumanoidRootPart
+                    local tHumanoid = target:FindFirstChildOfClass("Humanoid")
+                    
+                    local path = PathfindingService:CreatePath({AgentCanJump = true})
+                    path:ComputeAsync(cRoot.Position, tRoot.Position)
+                    
+                    if path.Status == Enum.PathStatus.Success then
+                        local waypoints = path:GetWaypoints()
+                        if waypoints[2] then
+                            cHumanoid:MoveTo(waypoints[2].Position)
+                            if waypoints[2].Action == Enum.PathWaypointAction.Jump then
+                                cHumanoid.Jump = true
+                            end
+                        end
+                    else
+                        cHumanoid:MoveTo(tRoot.Position)
+                    end
+                    
+                    if (tRoot.Position - cRoot.Position).Magnitude < 6 and tHumanoid and tHumanoid.Health > 0 then
+                        local v = Instance.new("BodyVelocity", tRoot)
+                        v.Velocity = Vector3.new(0, 150, 150)
+                        v.MaxForce = Vector3.new(1,1,1) * 1e8
+                        game.Debris:AddItem(v, 0.5)
+                        
+                        if fireEnabled and not tRoot:FindFirstChild("n00bFire") then
+                            local f = Instance.new("Fire", tRoot)
+                            f.Name = "n00bFire"
+                            task.spawn(function()
+                                for i = 1, 5 do
+                                    if tHumanoid and tHumanoid.Parent then 
+                                        tHumanoid.Health = tHumanoid.Health - 5 
+                                    end
+                                    task.wait(10)
+                                end
+                                f:Destroy()
+                            end)
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end
+end)
+
+createBtn("DECAL SPAM & SKY", function()
+    local s = Instance.new("Sky", Lighting)
+    for _, f in ipairs({"SkyboxBk","SkyboxDn","SkyboxFt","SkyboxLf","SkyboxRt","SkyboxUp"}) do s[f] = DECAL_IMAGE_ID end
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") then
+            for _, face in ipairs(Enum.NormalId:GetEnumItems()) do
+                local d = Instance.new("Decal", v)
+                d.Texture = DECAL_IMAGE_ID
+                d.Face = face
+            end
+        end
+    end
+end)
+
+createBtn("SPUKI MUSIK", function()
+    local s = Instance.new("Sound", workspace.CurrentCamera)
+    s.SoundId = MUSIC_ID
+    s.Volume = 5
+    s.Looped = true
+    s:Play()
+end)
+
+createBtn("IY (ADMIN)", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+createBtn("NA (ADMIN)", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Nameless-admin-v250-script-87765"))()
+end)
+
+createBtn("ESP (amigos)", function()
+    if _G.FriendsESPActive then return end
+    _G.FriendsESPActive = true
+    
+    task.spawn(function()
+        while true do
+            task.wait(0.5)
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= player and player:IsFriendsWith(p.UserId) then
+                    pcall(function()
+                        local targetChar = p.Character
+                        if not targetChar then return end
+                        local torso = targetChar:FindFirstChild("HumanoidRootPart") or targetChar:FindFirstChild("Torso")
+                        local hum = targetChar:FindFirstChild("Humanoid")
+                        local miRoot = player.Character and (player.Character:FindFirstChild("HumanoidRootPart") or player.Character:FindFirstChild("Torso"))
+                        
+                        if torso and hum and miRoot then
+                            local dist = math.floor((torso.Position - miRoot.Position).Magnitude)
+                            local distText = (dist < 10) and "esta aqui" or tostring(dist) .. " studs"
+                            local color = Color3.fromRGB(0, 255, 0)
+                            
+                            aplicarHighlight(targetChar, color)
+                            createfloatingtext(torso, 7, "@" .. p.Name, color)
+                            createfloatingtext(torso, 5.5, p.DisplayName, color)
+                            createfloatingtext(torso, 4, "Edad: " .. tostring(p.AccountAge) .. " dias", color)
+                            createfloatingtext(torso, 2.5, "HP: " .. math.floor(hum.Health) .. "/" .. math.floor(hum.MaxHealth), color)
+                            createfloatingtext(torso, 1, distText, color)
+                        end
+                    end)
+                end
+            end
+        end
+    end)
+end)
+
+createBtn("ESP (desconocidos)", function()
+    if _G.StrangersESPActive then return end
+    _G.StrangersESPActive = true
+    
+    task.spawn(function()
+        while true do
+            task.wait(0.5)
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= player and not player:IsFriendsWith(p.UserId) then
+                    pcall(function()
+                        local targetChar = p.Character
+                        if not targetChar then return end
+                        local torso = targetChar:FindFirstChild("HumanoidRootPart") or targetChar:FindFirstChild("Torso")
+                        local hum = targetChar:FindFirstChild("Humanoid")
+                        local miRoot = player.Character and (player.Character:FindFirstChild("HumanoidRootPart") or player.Character:FindFirstChild("Torso"))
+                        
+                        if torso and hum and miRoot then
+                            local dist = math.floor((torso.Position - miRoot.Position).Magnitude)
+                            local distText = (dist < 10) and "esta aqui" or tostring(dist) .. " studs"
+                            local color = Color3.fromRGB(0, 0, 255)
+                            
+                            aplicarHighlight(targetChar, color)
+                            createfloatingtext(torso, 7, "@" .. p.Name, color)
+                            createfloatingtext(torso, 5.5, p.DisplayName, color)
+                            createfloatingtext(torso, 4, "Edad: " .. tostring(p.AccountAge) .. " dias", color)
+                            createfloatingtext(torso, 2.5, "HP: " .. math.floor(hum.Health) .. "/" .. math.floor(hum.MaxHealth), color)
+                            createfloatingtext(torso, 1, distText, color)
+                        end
+                    end)
+                end
+            end
+        end
+    end)
+end)
+
+createBtn("ESP (NPCs)", function()
+    if _G.NpcESPActive then return end
+    _G.NpcESPActive = true
+    
+    task.spawn(function()
+        while true do
+            task.wait(0.5)
+            for _, npc in pairs(workspace:GetChildren()) do
+                pcall(function()
+                    if npc:FindFirstChild("Humanoid") and not Players:GetPlayerFromCharacter(npc) then
+                        local torso = npc:FindFirstChild("HumanoidRootPart") or npc:FindFirstChild("Torso")
+                        local hum = npc:FindFirstChild("Humanoid")
+                        local miRoot = player.Character and (player.Character:FindFirstChild("HumanoidRootPart") or player.Character:FindFirstChild("Torso"))
+                        
+                        if torso and hum and miRoot then
+                            local dist = math.floor((torso.Position - miRoot.Position).Magnitude)
+                            local distText = (dist < 10) and "esta aqui" or tostring(dist) .. " studs"
+                            local color = Color3.fromRGB(255, 255, 0)
+                            
+                            aplicarHighlight(npc, color)
+                            createfloatingtext(torso, 5, npc.Name, color)
+                            createfloatingtext(torso, 3.5, "HP: " .. math.floor(hum.Health) .. "/" .. math.floor(hum.MaxHealth), color)
+                            createfloatingtext(torso, 1.5, distText, color)
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+end)
+
+
+local mainCraAbierto = false
+createBtn("MainCra", function()
+    if mainCraAbierto then return end
+    mainCraAbierto = true
+
+    local isCrouchingR6 = false
+    local isPunchingR6 = false
+    local speedSavedR6 = 16
+
+    local isCrouchingR15 = false
+    local isPunchingR15 = false
+    local speedSavedR15 = 16
+
+    local isMinimized_MC = false
+
+    local origRootC0_R6, origLeftHipC0_R6, origRightHipC0_R6, origNeckC0_R6, origRightShoulderC0_R6
+    local origRootC0_R15, origLeftHipC0_R15, origRightHipC0_R15, origNeckC0_R15, origRightShoulderC0_R15
+    local origRightElbowC0_R15, origRightWristC0_R15
+    local jointsToFreezeR15 = {}
+    local freezeConnectionR15
+    
+    local animateBackup = nil -- Aquí guardamos la copia exacta de las animaciones nativas
+    
+    local function getRigType(char)
+        if char:WaitForChild("UpperTorso", 4) then return "R15" else return "R6" end
+    end
+    
+    local function setupJoints(char, rig)
+        if rig == "R6" then
+            local torso = char:WaitForChild("Torso", 5)
+            local rootPart = char:WaitForChild("HumanoidRootPart", 5)
+            if torso and rootPart then
+                local rootJoint = rootPart:WaitForChild("RootJoint", 5)
+                local leftHip = torso:WaitForChild("Left Hip", 5)
+                local rightHip = torso:WaitForChild("Right Hip", 5)
+                local neck = torso:WaitForChild("Neck", 5)
+                local rightShoulder = torso:WaitForChild("Right Shoulder", 5)
+                
+                if rootJoint then origRootC0_R6 = rootJoint.C0 end
+                if leftHip then origLeftHipC0_R6 = leftHip.C0 end
+                if rightHip then origRightHipC0_R6 = rightHip.C0 end
+                if neck then origNeckC0_R6 = neck.C0 end
+                if rightShoulder then origRightShoulderC0_R6 = rightShoulder.C0 end
+            end
+        elseif rig == "R15" then
+            local lowerTorso = char:WaitForChild("LowerTorso", 5)
+            local upperTorso = char:WaitForChild("UpperTorso", 5)
+            local rightUpperArm = char:WaitForChild("RightUpperArm", 5)
+            local rightLowerArm = char:WaitForChild("RightLowerArm", 5)
+            if lowerTorso and upperTorso and rightUpperArm and rightLowerArm then
+                local rootJoint = lowerTorso:WaitForChild("Root", 5)
+                local leftHip = char:WaitForChild("LeftUpperLeg", 5) and char.LeftUpperLeg:WaitForChild("LeftHip", 5)
+                local rightHip = char:WaitForChild("RightUpperLeg", 5) and char.RightUpperLeg:WaitForChild("RightHip", 5)
+                local neck = upperTorso:WaitForChild("Head", 5)
+                local rightShoulder = rightUpperArm:WaitForChild("RightShoulder", 5)
+                local rightElbow = rightLowerArm:WaitForChild("RightElbow", 5)
+                local rightWrist = char:WaitForChild("RightHand", 5) and char.RightHand:WaitForChild("RightWrist", 5)
+                
+                if rootJoint then origRootC0_R15 = rootJoint.C0 end
+                if leftHip then origLeftHipC0_R15 = leftHip.C0 end
+                if rightHip then origRightHipC0_R15 = rightHip.C0 end
+                if neck then origNeckC0_R15 = neck.C0 end
+                if rightShoulder then origRightShoulderC0_R15 = rightShoulder.C0 end
+                if rightElbow then origRightElbowC0_R15 = rightElbow.C0 end
+                if rightWrist then origRightWristC0_R15 = rightWrist.C0 end
+            end
+        end
+    end
+    
+    local function playMinecraftHit(char, rig)
+        if rig == "R6" then
+            if isPunchingR6 or not origRightShoulderC0_R6 then return end
+            isPunchingR6 = true
+            local rightShoulder = char.Torso:FindFirstChild("Right Shoulder")
+            if not rightShoulder then isPunchingR6 = false return end
+            
+            rightShoulder.C0 = origRightShoulderC0_R6 * CFrame.Angles(math.rad(65), math.rad(-15), math.rad(10))
+            task.wait(0.015) 
+            rightShoulder.C0 = origRightShoulderC0_R6 * CFrame.Angles(math.rad(75), math.rad(-5), math.rad(5))
+            task.wait(0.04) 
+            rightShoulder.C0 = origRightShoulderC0_R6
+            isPunchingR6 = false
+        else
+            if isPunchingR15 or not origRightShoulderC0_R15 then return end
+            isPunchingR15 = true
+            local rightShoulder = char.RightUpperArm:FindFirstChild("RightShoulder")
+            if not rightShoulder then isPunchingR15 = false return end
+            
+            if char.RightLowerArm:FindFirstChild("RightElbow") and origRightElbowC0_R15 then char.RightLowerArm.RightElbow.C0 = origRightElbowC0_R15 end
+            if char.RightHand:FindFirstChild("RightWrist") and origRightWristC0_R15 then char.RightHand.RightWrist.C0 = origRightWristC0_R15 end
+            
+            rightShoulder.C0 = origRightShoulderC0_R15 * CFrame.Angles(math.rad(65), math.rad(-15), math.rad(10))
+            task.wait(0.015) 
+            rightShoulder.C0 = origRightShoulderC0_R15 * CFrame.Angles(math.rad(75), math.rad(-5), math.rad(5))
+            task.wait(0.04) 
+            rightShoulder.C0 = origRightShoulderC0_R15
+            isPunchingR15 = false
+        end
+    end
+    
+    local function applyMinecraftCrouch(char, rig)
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
+        
+        if rig == "R6" then
+            local rootJoint = char.HumanoidRootPart:FindFirstChild("RootJoint")
+            local leftHip = char.Torso:FindFirstChild("Left Hip")
+            local rightHip = char.Torso:FindFirstChild("Right Hip")
+            local neck = char.Torso:FindFirstChild("Neck")
+            if not rootJoint or not leftHip or not rightHip or not neck or not origRootC0_R6 then return end
+            
+            if not isCrouchingR6 then
+                isCrouchingR6 = true
+                speedSavedR6 = humanoid.WalkSpeed
+                humanoid.WalkSpeed = math.max(0, speedSavedR6 - 5)
+                rootJoint.C0 = origRootC0_R6 * CFrame.Angles(math.rad(-22.5), 0, 0)
+                neck.C0 = origNeckC0_R6 * CFrame.Angles(math.rad(22.5), 0, 0)
+                leftHip.C0 = origLeftHipC0_R6 * CFrame.new(0, 0, 2)
+                rightHip.C0 = origRightHipC0_R6 * CFrame.new(0, 0, 2)
+            else
+                isCrouchingR6 = false
+                humanoid.WalkSpeed = speedSavedR6
+                rootJoint.C0 = origRootC0_R6
+                neck.C0 = origNeckC0_R6
+                leftHip.C0 = origLeftHipC0_R6
+                rightHip.C0 = origRightHipC0_R6
+            end
+        else
+            local rootJoint = char.LowerTorso:FindFirstChild("Root")
+            local leftHip = char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip")
+            local rightHip = char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip")
+            local neck = char.UpperTorso:FindFirstChild("Head")
+            if not rootJoint or not leftHip or not rightHip or not neck or not origRootC0_R15 then return end
+            
+            if not isCrouchingR15 then
+                isCrouchingR15 = true
+                speedSavedR15 = humanoid.WalkSpeed
+                humanoid.WalkSpeed = math.max(0, speedSavedR15 - 5)
+                rootJoint.C0 = origRootC0_R15 * CFrame.Angles(math.rad(-22.5), 0, 0)
+                neck.C0 = origNeckC0_R15 * CFrame.Angles(math.rad(22.5), 0, 0)
+                leftHip.C0 = origLeftHipC0_R15 * CFrame.new(0, 0, 0.4)
+                rightHip.C0 = origRightHipC0_R15 * CFrame.new(0, 0, 0.4)
+            else
+                isCrouchingR15 = false
+                humanoid.WalkSpeed = speedSavedR15
+                rootJoint.C0 = origRootC0_R15
+                neck.C0 = origNeckC0_R15
+                leftHip.C0 = origLeftHipC0_R15
+                rightHip.C0 = origRightHipC0_R15
+            end
+        end
+    end
+    
+    local function handleMinecraftDeath(char, humanoid, rig)
+        humanoid.BreakJointsOnDeath = false
+        humanoid.Died:Connect(function()
+            local rootJoint = (rig == "R6") and char.HumanoidRootPart:FindFirstChild("RootJoint") or char.LowerTorso:FindFirstChild("Root")
+            local currentOrigRoot = (rig == "R6") and origRootC0_R6 or origRootC0_R15
+            
+            local redHighlight = Instance.new("Highlight")
+            redHighlight.FillColor = Color3.fromRGB(255, 0, 0)
+            redHighlight.FillTransparency = 0.2
+            redHighlight.OutlineTransparency = 1
+            redHighlight.DepthMode = Enum.HighlightDepthMode.Occluded
+            redHighlight.Parent = char
+            
+            if rootJoint and currentOrigRoot then
+                rootJoint.C0 = currentOrigRoot * CFrame.Angles(0, 0, math.rad(90))
+            end
+            
+            task.wait(0.5)
+            for _, part in pairs(char:GetChildren()) do
+                if part:IsA("BasePart") then 
+                    part.Transparency = 1 
+                    part.CanCollide = false
+                elseif part:IsA("Accessory") and part:FindFirstChild("Handle") then 
+                    part.Handle.Transparency = 1 
+                end
+            end
+            redHighlight:Destroy()
+            task.wait(0.2)
+            humanoid:Destroy()
+        end)
+    end
+    
+    local ScreenGuiMC = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    local TopBar = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
+    local ButtonMin = Instance.new("TextButton")
+    local ButtonClose = Instance.new("TextButton")
+    local ContentFrame = Instance.new("Frame")
+    local UIListLayout_MC = Instance.new("UIListLayout")
+    local ButtonCrouch = Instance.new("TextButton")
+    local ButtonPunch = Instance.new("TextButton")
+
+    ScreenGuiMC.Parent = game:GetService("CoreGui")
+    ScreenGuiMC.ResetOnSpawn = false
+
+    MainFrame.Parent = ScreenGuiMC
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    MainFrame.Position = UDim2.new(0.4, 0, 0.4, 0)
+    MainFrame.Size = UDim2.new(0, 160, 0, 140)
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+
+    TopBar.Parent = MainFrame
+    TopBar.Size = UDim2.new(1, 0, 0, 25)
+    TopBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+    Title.Parent = TopBar
+    Title.Size = UDim2.new(0.6, 0, 1, 0)
+    Title.Position = UDim2.new(0.05, 0, 0, 0)
+    Title.Text = "MC Script"
+    Title.TextColor3 = Color3.fromRGB(240, 240, 240)
+    Title.Font = Enum.Font.Code
+    Title.TextSize = 14
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    ButtonMin.Parent = TopBar
+    ButtonMin.Size = UDim2.new(0.2, 0, 1, 0)
+    ButtonMin.Position = UDim2.new(0.6, 0, 0, 0)
+    ButtonMin.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    ButtonMin.Text = "-"
+    ButtonMin.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ButtonMin.Font = Enum.Font.Code
+    ButtonMin.TextSize = 16
+    
+    ButtonClose.Parent = TopBar
+    ButtonClose.Size = UDim2.new(0.2, 0, 1, 0)
+    ButtonClose.Position = UDim2.new(0.8, 0, 0, 0)
+    ButtonClose.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
+    ButtonClose.Text = "X"
+    ButtonClose.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ButtonClose.Font = Enum.Font.Code
+    ButtonClose.TextSize = 16
+
+    ContentFrame.Parent = MainFrame
+    ContentFrame.Size = UDim2.new(1, 0, 1, -25)
+    ContentFrame.Position = UDim2.new(0, 0, 0, 25)
+    ContentFrame.BackgroundTransparency = 1
+
+    UIListLayout_MC.Parent = ContentFrame
+    UIListLayout_MC.Padding = UDim.new(0, 8)
+    UIListLayout_MC.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    local function styleActionBtn(btn, text)
+        btn.Parent = ContentFrame
+        btn.Size = UDim2.new(0.9, 0, 0, 45)
+        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        btn.Text = text
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.Font = Enum.Font.Code
+        btn.TextSize = 16
+    end
+    
+    styleActionBtn(ButtonCrouch, "Agacharse")
+    styleActionBtn(ButtonPunch, "Golpear")
+
+    ButtonMin.MouseButton1Click:Connect(function()
+        if not isMinimized_MC then
+            isMinimized_MC = true
+            ButtonMin.Text = "+"
+            ContentFrame.Visible = false
+            MainFrame.Size = UDim2.new(0, 160, 0, 25)
+        else
+            isMinimized_MC = false
+            ButtonMin.Text = "-"
+            ContentFrame.Visible = true
+            MainFrame.Size = UDim2.new(0, 160, 0, 140)
+        end
+    end)
+
+    local currentRig = "R6"
+    local function updateButtonColor()
+        local active = (currentRig == "R6" and isCrouchingR6) or (currentRig == "R15" and isCrouchingR15)
+        ButtonCrouch.BackgroundColor3 = active and Color3.fromRGB(30, 120, 30) or Color3.fromRGB(60, 60, 60)
+    end
+    
+    local function initializeSystem()
+        local char = player.Character or player.CharacterAdded:Wait()
+        isCrouchingR6, isPunchingR6, isCrouchingR15, isPunchingR15 = false, false, false, false
+        origRootC0_R6, origLeftHipC0_R6, origRightHipC0_R6, origNeckC0_R6, origRightShoulderC0_R6 = nil, nil, nil, nil, nil
+        origRootC0_R15, origLeftHipC0_R15, origRightHipC0_R15, origNeckC0_R15, origRightShoulderC0_R15 = nil, nil, nil, nil, nil
+        origRightElbowC0_R15, origRightWristC0_R15 = nil, nil
+        if freezeConnectionR15 then freezeConnectionR15:Disconnect() end
+        
+        currentRig = getRigType(char)
+        print("[Minecraft Unificado]: Detectado avatar de tipo " .. currentRig)
+        
+        local animateScript = char:WaitForChild("Animate", 5)
+        if animateScript then 
+            animateBackup = animateScript:Clone()
+            animateScript.Disabled = true 
+            animateScript:Destroy() 
+        end
+        
+        local humanoid = char:WaitForChild("Humanoid")
+        local animator = humanoid:FindFirstChildOfClass("Animator") or humanoid
+        if animator then
+            for _, track in pairs(animator:GetPlayingAnimationTracks()) do track:Stop() end
+        end
+        
+        setupJoints(char, currentRig)
+        handleMinecraftDeath(char, humanoid, currentRig)
+        
+        if currentRig == "R15" then
+            jointsToFreezeR15 = {
+                char:WaitForChild("RightLowerArm", 5) and char.RightLowerArm:WaitForChild("RightElbow", 5),
+                char:WaitForChild("RightHand", 5) and char.RightHand:WaitForChild("RightWrist", 5),
+                char:WaitForChild("LeftLowerArm", 5) and char.LeftLowerArm:WaitForChild("LeftElbow", 5),
+                char:WaitForChild("LeftHand", 5) and char.LeftHand:WaitForChild("LeftWrist", 5),
+                char:WaitForChild("RightLowerLeg", 5) and char.RightLowerLeg:WaitForChild("RightKnee", 5),
+                char:WaitForChild("RightFoot", 5) and char.RightFoot:WaitForChild("RightAnkle", 5),
+                char:WaitForChild("LeftLowerLeg", 5) and char.LeftLowerLeg:WaitForChild("LeftKnee", 5),
+                char:WaitForChild("LeftFoot", 5) and char.LeftFoot:WaitForChild("LeftAnkle", 5)
+            }
+            freezeConnectionR15 = RunService.Stepped:Connect(function()
+                if not char or not char.Parent or humanoid.Health <= 0 then 
+                    freezeConnectionR15:Disconnect() 
+                    return 
+                end
+                for _, joint in pairs(jointsToFreezeR15) do
+                    if isPunchingR15 and (joint.Name == "RightElbow" or joint.Name == "RightWrist") then continue end
+                    if joint and joint:IsA("Motor6D") then
+                        joint.C0 = CFrame.new(joint.C0.Position) * CFrame.Angles(0, 0, 0)
+                    end
+                end
+            end)
+        end
+        updateButtonColor()
+    end
+    
+
+    local function restoreAnimations()
+        local char = player.Character
+        if not char then return end
+        
+        if freezeConnectionR15 then 
+            freezeConnectionR15:Disconnect() 
+            freezeConnectionR15 = nil
+        end
+        
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if currentRig == "R6" and isCrouchingR6 then
+                humanoid.WalkSpeed = speedSavedR6
+            elseif currentRig == "R15" and isCrouchingR15 then
+                humanoid.WalkSpeed = speedSavedR15
+            end
+        end
+        
+        if currentRig == "R6" then
+            local torso = char:FindFirstChild("Torso")
+            local rootPart = char:FindFirstChild("HumanoidRootPart")
+            if torso and rootPart then
+                local rootJoint = rootPart:FindFirstChild("RootJoint")
+                local leftHip = torso:FindFirstChild("Left Hip")
+                local rightHip = torso:FindFirstChild("Right Hip")
+                local neck = torso:FindFirstChild("Neck")
+                local rightShoulder = torso:FindFirstChild("Right Shoulder")
+                
+                if rootJoint and origRootC0_R6 then rootJoint.C0 = origRootC0_R6 end
+                if leftHip and origLeftHipC0_R6 then leftHip.C0 = origLeftHipC0_R6 end
+                if rightHip and origRightHipC0_R6 then rightHip.C0 = origRightHipC0_R6 end
+                if neck and origNeckC0_R6 then neck.C0 = origNeckC0_R6 end
+                if rightShoulder and origRightShoulderC0_R6 then rightShoulder.C0 = origRightShoulderC0_R6 end
+            end
+            isCrouchingR6 = false
+            isPunchingR6 = false
+        elseif currentRig == "R15" then
+            local lowerTorso = char:FindFirstChild("LowerTorso")
+            local upperTorso = char:FindFirstChild("UpperTorso")
+            local rightUpperArm = char:FindFirstChild("RightUpperArm")
+            if lowerTorso and upperTorso and rightUpperArm then
+                local rootJoint = lowerTorso:FindFirstChild("Root")
+                local leftHip = char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip")
+                local rightHip = char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip")
+                local neck = upperTorso:FindFirstChild("Head")
+                local rightShoulder = rightUpperArm:FindFirstChild("RightShoulder")
+                local rightElbow = char:FindFirstChild("RightLowerArm") and char.RightLowerArm:FindFirstChild("RightElbow")
+                local rightWrist = char:FindFirstChild("RightHand") and char.RightHand:FindFirstChild("RightWrist")
+                
+                if rootJoint and origRootC0_R15 then rootJoint.C0 = origRootC0_R15 end
+                if leftHip and origLeftHipC0_R15 then leftHip.C0 = origLeftHipC0_R15 end
+                if rightHip and origRightHipC0_R15 then rightHip.C0 = origRightHipC0_R15 end
+                if neck and origNeckC0_R15 then neck.C0 = origNeckC0_R15 end
+                if rightShoulder and origRightShoulderC0_R15 then rightShoulder.C0 = origRightShoulderC0_R15 end
+                if rightElbow and origRightElbowC0_R15 then rightElbow.C0 = origRightElbowC0_R15 end
+                if rightWrist and origRightWristC0_R15 then rightWrist.C0 = origRightWristC0_R15 end
+            end
+            isCrouchingR15 = false
+            isPunchingR15 = false
+        end
+        
+        
+        if animateBackup then
+            local newAnimate = animateBackup:Clone()
+            newAnimate.Parent = char
+            newAnimate.Disabled = false
+        end
+    end
+    
+    ButtonCrouch.MouseButton1Click:Connect(function()
+        local char = player.Character
+        if char then
+            applyMinecraftCrouch(char, currentRig)
+            updateButtonColor()
+        end
+    end)
+    
+    ButtonPunch.MouseButton1Click:Connect(function()
+        local char = player.Character
+        if char then playMinecraftHit(char, currentRig) end
+    end)
+    
+    local charAddedConn = player.CharacterAdded:Connect(initializeSystem)
+    initializeSystem()
+    
+    ButtonClose.MouseButton1Click:Connect(function()
+        restoreAnimations() -- Resetea movimientos e inyecta de nuevo el script "Animate"
+        if charAddedConn then charAddedConn:Disconnect() end
+        ScreenGuiMC:Destroy()
+        mainCraAbierto = false
+    end)
+end)
+
+createBtn("Lag Falso", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-FE-Egor-script-can-customize-48846"))()
+end)
+ 
+createBtn("convertirse en SCP", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-SCP-096-GUI-UNIVERSIAL-41936"))()
+end)
+  
+createBtn("lanzar a la gente", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Touch-Fling-Script-by-Mirac-74775"))()
+end)
+
+createBtn("gravedad 0", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Zero-Gravity-29684"))()
+end)
+ 
+createBtn("Animaciones FE (solo r6)", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-FE-R6-animationzz-194051"))()
+end)
+
+createBtn("emotes gratis (solo r15)", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Emotes-free-40k-205737"))()
+end)
+ 
+
+createBtn("emotes de chat", function()
+    local TextChatService = game:GetService("TextChatService")
+
+    local SubMain = Instance.new("Frame", ScreenGui)
+    SubMain.Size = UDim2.new(0, 130, 0, 240)
+    SubMain.Position = UDim2.new(0.3, 0, 0.2, 0)
+    SubMain.BackgroundColor3 = Color3.new(0, 0, 0)
+    SubMain.BorderColor3 = Color3.fromRGB(255, 255, 0)
+    SubMain.BorderSizePixel = 1
+    SubMain.Active = true
+    SubMain.Draggable = true
+
+    local SubBanner = Instance.new("TextLabel", SubMain)
+    SubBanner.Size = UDim2.new(1, 0, 0, 40)
+    SubBanner.Position = UDim2.new(0, 0, 0, 0)
+    SubBanner.BackgroundColor3 = Color3.fromRGB(200, 200, 0)
+    SubBanner.Text = "n00bgui anims by noobscripter0123"
+    SubBanner.TextColor3 = Color3.new(0, 0, 0)
+    SubBanner.TextScaled = true
+    SubBanner.Font = Enum.Font.Code
+
+    local SubScroll = Instance.new("ScrollingFrame", SubMain)
+    SubScroll.Size = UDim2.new(1, 0, 1, -50)
+    SubScroll.Position = UDim2.new(0, 0, 0, 40)
+    SubScroll.BackgroundTransparency = 1
+    SubScroll.CanvasSize = UDim2.new(0, 0, 2.5, 0)
+
+    local SubLayout = Instance.new("UIListLayout", SubScroll)
+    SubLayout.Padding = UDim.new(0, 5)
+    SubLayout.HorizontalAlignment = "Center"
+
+    local globalSpeed = 1
+    local forceLoop = false
+
+    local function playEmote(emoteCommand, isDance)
+        local character = player.Character
+        if not character then return end
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+            if channel then channel:SendAsync(emoteCommand) end
+        else
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(emoteCommand, "All")
+        end
+
+        task.wait(0.1)
+        
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if animator then
+            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                if track.Name ~= "WalkAnim" and track.Name ~= "LookAnim" then
+                    track:AdjustSpeed(globalSpeed)
+                    if isDance then
+                        track.Looped = true
+                    else
+                        track.Looped = forceLoop
+                    end
+                end
+            end
+        end
+    end
+
+    local function createSubBtn(text, func)
+        local b = Instance.new("TextButton", SubScroll)
+        b.Size = UDim2.new(0.90, 0, 0, 35)
+        b.Text = text
+        b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        b.TextColor3 = Color3.fromRGB(255, 255, 0)
+        b.Font = Enum.Font.SourceSansBold
+        b.TextSize = 8
+        b.BorderSizePixel = 0.5
+        b.BorderColor3 = Color3.fromRGB(255, 255, 0)
+        b.MouseButton1Click:Connect(func)
+        return b
+    end
+
+    local SubMinBtn = Instance.new("TextButton", SubBanner)
+    SubMinBtn.Size = UDim2.new(0, 30, 0, 30)
+    SubMinBtn.Position = UDim2.new(1, -35, 0.5, -15)
+    SubMinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    SubMinBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    SubMinBtn.BorderSizePixel = 2
+    SubMinBtn.Text = "-"
+    SubMinBtn.TextColor3 = Color3.fromRGB(255, 255, 0)
+    SubMinBtn.TextSize = 20
+    SubMinBtn.Font = Enum.Font.SourceSansBold
+
+    local subMinimizado = false
+    SubMinBtn.MouseButton1Click:Connect(function()
+        if not subMinimizado then
+            SubScroll.Visible = false
+            SubMain.Size = UDim2.new(0, 130, 0, 40)
+            SubMinBtn.Text = "+"
+            subMinimizado = true
+        else
+            SubMain.Size = UDim2.new(0, 130, 0, 240)
+            SubScroll.Visible = true
+            SubMinBtn.Text = "-"
+            subMinimizado = false
+        end
+    end)
+
+    createSubBtn("reir", function() playEmote("/e laugh", false) end)
+    createSubBtn("baile 1", function() playEmote("/e dance", true) end)
+    createSubBtn("baile 2", function() playEmote("/e dance2", true) end)
+    createSubBtn("baile 3", function() playEmote("/e dance3", true) end)
+    createSubBtn("saludar", function() playEmote("/e wave", false) end)
+    createSubBtn("saltar", function() playEmote("/e cheer", false) end)
+    createSubBtn("apuntar", function() playEmote("/e point", false) end)
+    
+    local speedBtn = createSubBtn("velocidad de animación", function() end)
+    speedBtn.Active = false
+
+    local speedInput = Instance.new("TextBox", SubScroll)
+    speedInput.Size = UDim2.new(0.9, 0, 0, 30)
+    speedInput.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+    speedInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+    speedInput.Font = Enum.Font.SourceSansBold
+    speedInput.TextSize = 16
+    speedInput.Text = "1"
+    speedInput.PlaceholderText = "Escribe velocidad..."
+
+    speedInput.FocusLost:Connect(function(enterPressed)
+        local num = tonumber(speedInput.Text)
+        if num then globalSpeed = num else speedInput.Text = tostring(globalSpeed) end
+    end)
+
+    createSubBtn("reiniciar velocidad de animación", function()
+        globalSpeed = 1
+        speedInput.Text = "1"
+    end)
+
+    createSubBtn("correr en loop", function()
+        forceLoop = true
+    end)
+
+    createSubBtn("correr una vez", function()
+        forceLoop = false
+    end)
+end)
